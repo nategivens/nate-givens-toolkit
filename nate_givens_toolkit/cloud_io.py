@@ -26,10 +26,12 @@ def push_file_to_s3(local_filename, local_dir, bucket_dir, bucket, bucket_filena
             logging.error(e)
             return False
         return True
-        
 
-def pull_data_from_url(url_filename, url, local_dir, local_filename=None, overwrite=False):
+def pull_data_from_url(url_filename, url_path, local_dir, local_filename=None, overwrite=False):
     """Copy a file from URL to local directory
+    
+    Only writes the file if the file exists remotely and (does not exist locally or overwrite is True)
+    Returns True if it writes the file locally, False otherwise.
     
     :param url_filename: the name of the file at the URL to be pulled
     :param url: the url where the target file resides
@@ -39,10 +41,16 @@ def pull_data_from_url(url_filename, url, local_dir, local_filename=None, overwr
     """
     if local_filename is None:
         local_filename = url_filename
-    if (not os.path.isfile(os.path.join(local_dir, local_filename))) or overwrite: 
-        url_file = url + url_filename
-        r = requests.get(url_file, allow_redirects = False)
-        open(os.path.join(local_dir, local_filename), 'wb').write(r.content)
+    if (not os.path.isfile(os.path.join(local_dir, local_filename))) or overwrite:
+        url_file = url_path + url_filename
+        r = requests.get(url_file)
+        if r.status_code != 200:
+            return False
+        else:
+            open(os.path.join(local_dir, local_filename), 'wb').write(r.content)
+            return True
+    else:
+        return False
         
 def pull_file_from_s3(bucket_filename, bucket_dir, bucket, local_dir, local_filename = None, overwrite=False):
     """Retrieve bucket\bucket_dir\bucket_filename and store as local_dir\local_filename
