@@ -26,6 +26,8 @@ def push_file_to_s3(local_filename, local_dir, bucket_dir, bucket, bucket_filena
             logging.error(e)
             return False
         return True
+    else:
+        return False
 
 def pull_data_from_url(url_filename, url_path, local_dir, local_filename=None, overwrite=False):
     """Copy a file from URL to local directory
@@ -67,13 +69,15 @@ def pull_file_from_s3(bucket_filename, bucket_dir, bucket, local_dir, local_file
     if local_filename is None:
         local_filename = bucket_filename
     if not file_exists_in_s3(bucket_filename, bucket_dir, bucket):
-        return
+        return False
     if (not os.path.isfile(os.path.join(local_dir, local_filename))) or overwrite:
         source_file = os.path.join(bucket_dir, bucket_filename)
         dest_file = os.path.join(local_dir, local_filename)
         s3 = boto3.client('s3')
         s3.download_file(bucket, source_file, dest_file)
-        return(f'downloading {source_file} from s3 as {dest_file}')
+        return True
+    else:
+        return False
 
 def file_exists_in_s3(bucket_filename, bucket_dir, bucket):
     """Return True if bucket\bucket_dir\bucket_filename exists, otherwise False
