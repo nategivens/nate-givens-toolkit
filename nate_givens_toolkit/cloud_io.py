@@ -97,6 +97,3 @@ def file_exists_in_s3(bucket_filename, bucket_dir, bucket):
             raise
     else:
         return True
-    
-def test_me():
-    return 'tested!'
