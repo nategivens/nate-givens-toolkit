@@ -79,6 +79,27 @@ def pull_file_from_s3(bucket_filename, bucket_dir, bucket, local_dir, local_file
     else:
         return False
 
+def read_csv_from_s3(bucket_filename, bucket_dir, bucket, **kwargs):
+    """Uses Pandas read_csv to read in a csv from an S3 bucket
+    
+    :param bucket_filename: the name of the file we're reading into a Pandas dataframe
+    :parm bucket_dir: the path to bucket_filename in the bucket
+    :param bucket: the bucket to check (defaults to nate-givens-ds)
+    :**kwargs: additional keyword args to pass to Pandas read_csv method
+    """
+    df = pd.read_csv('s3://' + bucket.strip('/') + '/' + bucket_dir.strip('/') + '/' + bucket_filename, **kwargs)
+    return df
+
+def write_csv_to_s3(bucket_filename, bucket_dir, bucket, df, **kwargs):
+    """Uses Pandas to_csv to write a csv to an S3 bucket
+    
+    :param bucket_filename: the name of the file we're writing to the S3 bucket
+    :parm bucket_dir: the path to bucket_filename in the bucket
+    :param bucket: the bucket to check (defaults to nate-givens-ds)
+    :**kwargs: additional keyword args to pass to Pandas read_csv method
+    """
+    df.to_csv('s3://' + bucket.strip('/') + '/' + bucket_dir.strip('/') + '/' + bucket_filename, **kwargs)
+    
 def file_exists_in_s3(bucket_filename, bucket_dir, bucket):
     """Return True if bucket\bucket_dir\bucket_filename exists, otherwise False
     
